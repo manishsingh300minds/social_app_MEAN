@@ -12,13 +12,13 @@ const jwt = require('jsonwebtoken');
             });
             user.save().then(result => {
                 res.status(201).json({
-                    message : 'User created',
+                    message : 'New user has been created',
                     result: result
                 });
             })
             .catch(err => {
                res.status(500).json({
-                   error : err
+                       message : 'User already exits, please login or use different email id.'
                })
             })
         })
@@ -55,7 +55,7 @@ const jwt = require('jsonwebtoken');
 
     function handle401(res) {
         return res.status(401).json({
-            message: 'Auth failed'
+            message: 'Invalid email id or password.'
         })
     }
 

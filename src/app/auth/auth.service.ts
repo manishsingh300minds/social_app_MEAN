@@ -1,10 +1,11 @@
 import {Injectable} from "@angular/core";
 import {Router} from "@angular/router";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {Observable, pipe, Subject} from "rxjs";
-import {catchError} from "rxjs/operators";
+import {HttpClient} from "@angular/common/http";
+import {Subject} from "rxjs";
 import {AuthData} from "../models/authDataModel";
 import {environment} from "../../environments/environment";
+import {AlertComponent} from "../alert/alert.component";
+import {MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition} from "@angular/material/snack-bar";
 
 @Injectable({
     providedIn: 'root'
@@ -16,8 +17,9 @@ export class AuthService{
     private authStatusListener = new Subject<boolean>();
     private tokenTimer: any;
     private userId!: string | null;
-
-    constructor(private http : HttpClient, private router: Router) {
+    horizontalPosition: MatSnackBarHorizontalPosition = 'end';
+    verticalPosition: MatSnackBarVerticalPosition = 'top';
+    constructor(private http : HttpClient, private router: Router, private alert:MatSnackBar) {
     }
 
     getToken(){
@@ -51,12 +53,24 @@ export class AuthService{
         }
     }
 
-    createUser(email : string, password : string): Observable<any> {
+    createUser(email : string, password : string): void {
         const user: AuthData = {
             email: email,
             password: password
         }
-      return  this.http.post<AuthData>(this.api+'/signup',user).pipe(catchError(this.handleError));
+      this.http.post<AuthData>(this.api+'/signup',user).subscribe((res : any) => {
+          this.alert.openFromComponent(AlertComponent, {
+              duration: 2000,
+              horizontalPosition: this.horizontalPosition,
+              verticalPosition: this.verticalPosition,
+              panelClass: 'alertComponent',
+              data: {message : res.message}
+          });
+          this.router.navigate(['auth','signup']);
+      },
+      (error : any) => {
+          this.router.navigate(['auth','signup']);
+      });
     }
 
     loginUser(email: string, password: string): any{
@@ -78,7 +92,9 @@ export class AuthService{
                     this.router.navigate(['/']);
                 }
             },
-            pipe(catchError(this.handleError))
+            (err) => {
+            this.router.navigate(['auth','login']);
+            }
         );
     }
 
@@ -90,6 +106,13 @@ export class AuthService{
         this.router.navigate(['/']);
         this.clearAuthData();
         clearTimeout(this.tokenTimer);
+        this.alert.openFromComponent(AlertComponent, {
+            duration: 2000,
+            horizontalPosition: this.horizontalPosition,
+            verticalPosition: this.verticalPosition,
+            panelClass: 'alertComponent',
+            data: {message : 'Logged out successfully'}
+        });
     }
 
     private saveAuthData(token: string, expirationDate: Date, userId: any){
@@ -122,15 +145,5 @@ export class AuthService{
         this.tokenTimer =  setTimeout(() => {
             this.logoutUser();
         }, duration * 1000);
-    }
-
-    private handleError(errorResponse: HttpErrorResponse): Observable<any> {
-        if (errorResponse.error instanceof Error) {
-            console.log("Client Side Error:", errorResponse.error.message);
-        }
-        else {
-            console.log("Client Side Error:", errorResponse);
-        }
-        return errorResponse.error;
     }
 }

@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import {NgForm} from "@angular/forms";
-import {AuthService} from "../auth.service";
+import {Component, ViewEncapsulation} from '@angular/core';
+import { NgForm } from "@angular/forms";
+import { Router } from '@angular/router';
+import { AuthService } from "../auth.service";
 
 @Component({
   selector: 'login',
@@ -8,17 +9,13 @@ import {AuthService} from "../auth.service";
   styleUrls: ['./signup.component.scss'],
   encapsulation: ViewEncapsulation.Emulated
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent {
   cardTitle = 'Sign Up';
-  constructor(private authService: AuthService) { }
 
-  ngOnInit(): void {
-  }
+  constructor(private authService: AuthService,private router: Router) { }
 
-  onSignup(form : NgForm):void{
-    console.log(form.value)
-    this.authService.createUser(form.value.email,form.value.password).subscribe(res => {
-      console.log("Response",res);
-    });
+    onSignup(form : NgForm):void{
+    this.authService.createUser(form.value.email,form.value.password);
+    form.reset();
   }
 }

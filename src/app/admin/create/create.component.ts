@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { PostsService } from '../../services/posts.service';
 import { ActivatedRoute, Router } from "@angular/router";
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { mimeType } from "./mime-type.validator";
+import {MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition} from "@angular/material/snack-bar";
+import {AlertComponent} from "../../alert/alert.component";
 
 @Component({
   selector: 'create',
@@ -14,10 +13,8 @@ import { mimeType } from "./mime-type.validator";
 })
 export class CreateComponent implements OnInit {
 
-  private _success = new Subject<string>();
-  alertMessage = '';
-  @ViewChild('selfClosingAlert', { static: false }) selfClosingAlert!: NgbAlert;
-
+  horizontalPosition: MatSnackBarHorizontalPosition = 'end';
+  verticalPosition: MatSnackBarVerticalPosition = 'top';
   postForm!: FormGroup;
   public mode = 'create';
   post: any;
@@ -27,11 +24,9 @@ export class CreateComponent implements OnInit {
   imagePreview: any = null;
   imagePath: string | null = '';
 
-  constructor(private postService: PostsService, public route: ActivatedRoute, public router: Router) { }
+  constructor(private postService: PostsService, public route: ActivatedRoute, public router: Router,private alert:MatSnackBar) { }
 
   ngOnInit(): void {
-    this._success.subscribe(message => this.alertMessage = message);
-
     this.postForm = new FormGroup({
       'title': new FormControl(null, {
         validators: [Validators.required]
@@ -54,7 +49,6 @@ export class CreateComponent implements OnInit {
           image: param.get('image')
         }
         this.postForm.get('image')?.clearValidators();
-        // this.getFormValidationErrors();
         this.editPostId = param.get('id');
         this.mode = 'edit';
         this.cardTitle = 'Update your Post!!'
@@ -85,11 +79,13 @@ export class CreateComponent implements OnInit {
     const newPost = this.postForm.value;
     if (this.mode === 'create') {
       this.postService.addPost(newPost).subscribe((res) => {
-        this._success.next(res.msg);
-        this._success.pipe(debounceTime(5000)).subscribe(() => {
-          if (this.selfClosingAlert)
-            this.selfClosingAlert.close();
-        });
+            this.alert.openFromComponent(AlertComponent, {
+              duration: 2000,
+              horizontalPosition: this.horizontalPosition,
+              verticalPosition: this.verticalPosition,
+              panelClass: 'alertComponent',
+              data: {message : 'Added post successfully'}
+            });
         this.postForm.reset();
       },
         (error: any) => console.log("Server error:", error));
@@ -103,11 +99,13 @@ export class CreateComponent implements OnInit {
       }
       this.postService.updatePost(this.editPostId, newPost.title, newPost.description, this.imagePath).subscribe((res) => {
         this.router.navigate(['dashboard','create']);
-            this._success.next(res.msg);
-            this._success.pipe(debounceTime(5000)).subscribe(() => {
-              if (this.selfClosingAlert)
-                this.selfClosingAlert.close();
-        });
+            this.alert.openFromComponent(AlertComponent, {
+              duration: 2000,
+              horizontalPosition: this.horizontalPosition,
+              verticalPosition: this.verticalPosition,
+              panelClass: 'alertComponent',
+              data: {message : 'Updated post successfully'}
+            });
       },
         (error: any) => console.log("Updating server error:", error));
     }

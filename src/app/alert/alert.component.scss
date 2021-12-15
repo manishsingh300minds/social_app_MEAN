@@ -1,0 +1,10 @@
+.alert-component{
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 12px;
+
+  .message{
+    margin-left: 20px;
+  }
+}

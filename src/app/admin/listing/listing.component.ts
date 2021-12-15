@@ -5,6 +5,8 @@ import { PostType } from "../../models/post.model";
 import {PageEvent} from "@angular/material/paginator";
 import {Subscription} from "rxjs";
 import {AuthService} from "../../auth/auth.service";
+import {MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition} from "@angular/material/snack-bar";
+import {AlertComponent} from "../../alert/alert.component";
 
 @Component({
   selector: 'listing',
@@ -15,6 +17,9 @@ export class ListingComponent implements OnInit,OnDestroy {
   private authSubs!: Subscription;
   isAuthenticated = false;
 
+  horizontalPosition: MatSnackBarHorizontalPosition = 'end';
+  verticalPosition: MatSnackBarVerticalPosition = 'top';
+
   userId!: string | null;
   postData: PostType[] = [];
   expand = false;
@@ -23,7 +28,7 @@ export class ListingComponent implements OnInit,OnDestroy {
   currentPage = 1;
   pageSizeOptions = [2,5,10,20];
 
-  constructor(private postService: PostsService, public router: Router, private authService: AuthService) {}
+  constructor(private postService: PostsService, public router: Router, private authService: AuthService, private alert:MatSnackBar) {}
 
   ngOnInit(): void {
     this.getPosts(this.postsPerPage,this.currentPage);
@@ -48,9 +53,15 @@ export class ListingComponent implements OnInit,OnDestroy {
 
   deletePost(post: any) {
     const postId = post.id;
-    this.postService.deletePost(postId).subscribe(() => {
+    this.postService.deletePost(postId).subscribe((res) => {
+        this.alert.openFromComponent(AlertComponent, {
+          duration: 2000,
+          horizontalPosition: this.horizontalPosition,
+          verticalPosition: this.verticalPosition,
+          panelClass: 'alertComponent',
+          data: {message : 'Deleted post successfully'}
+        });
         this.getPosts(this.postsPerPage,this.currentPage);
-        alert(post.title + ' post has been deleted')
       },
       (err) => console.log("Error: ", err)
     );

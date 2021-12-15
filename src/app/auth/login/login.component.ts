@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
   }
 
   onLogin(form : NgForm):void{
-    console.log("Login",form.value);
     this.authService.loginUser(form.value.email,form.value.password);
+    form.reset();
   }
 }

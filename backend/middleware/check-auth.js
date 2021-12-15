@@ -7,7 +7,7 @@ module.exports = (req,res,next) => {
         next();
     }catch(error){
         res.status(401).json({
-            message: 'Auth failed'
+            message: 'This email id is already in use. Please use different email id.'
         })
     }
 }

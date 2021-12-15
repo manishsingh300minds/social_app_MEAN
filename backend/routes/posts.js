@@ -46,6 +46,10 @@ const check_auth = require('../middleware/check-auth');
         posts : fetchedPost,
         maxPosts: count
       })
+    }).catch(error => {
+      res.status(500).json({
+        message : 'Fetching post failed'
+      })
     })
   });
 
@@ -65,7 +69,12 @@ const check_auth = require('../middleware/check-auth');
           ...addedPost,
           id : addedPost._id,
         }
-      });
+      })
+        .catch(error => {
+          res.status(500).json({
+            message: 'Failed to upload your Post. Please try again.'
+          })
+        })
     });
   })
 
@@ -83,22 +92,28 @@ const check_auth = require('../middleware/check-auth');
       creator: req.userData.userId
     });
     Post.updateOne({_id : req.params.id, creator: req.userData.userId},editedPost).then(result => {
-      if(result.nModified > 0){
+      console.log('On update',result);
+      if(result.modifiedCount > 0){
         res.status(200).json({
           msg : 'Update successful!!'
-        });
+        })
       } else{
         res.status(401).json({
-          msg : 'Unauthorized User!!'
+          message : 'Unauthorized User!!'
         });
       }
+    }).catch(error => {
+      res.status(500).json({
+        message: 'Failed to update your Post. Please try again.'
+      })
     });
   })
 
   router.delete("/listing/:id",check_auth,(req ,res) => {
     Post.deleteOne({_id: req.params.id,creator: req.userData.userId})
     .then(result => {
-      if(result.n > 0){
+      console.log('on delete',result);
+      if(result.deletedCount > 0){
         res.status(200).json({
           msg : 'Deletion successful!!'
         });
@@ -107,7 +122,11 @@ const check_auth = require('../middleware/check-auth');
           msg : 'Unauthorized User!!'
         });
       }
-    });
+    }).catch(error => {
+      res.status(500).json({
+        message: 'Failed to delete the Post. Please try again.'
+      })
+    });;
   })
 
 module.exports = router;
