@@ -10,12 +10,12 @@
               <div class="accordion-item" *ngFor="let post of postData; let i = index">
                 <div class="accordion-header  container-fluid" [id]="'heading'+i">
                   <div id="wrapper" class="row">
-                    <div class="accordion-button w-100" [ngClass]="{ 'collapsed': i != 0, 'w-90' : isAuthenticated == true}" type="button"
+                    <div class="accordion-button w-100" [ngClass]="{ 'collapsed': i != 0, 'w-90' : isAuthenticated && userId === post.creator}" type="button"
                       data-bs-toggle="collapse" [attr.data-bs-target]="'#post'+i" aria-expanded="true"
                       [attr.aria-controls]="'collapse'+i">
                       {{post.title}}
                     </div>
-                    <div class="handler" *ngIf="isAuthenticated">
+                    <div class="handler" *ngIf="isAuthenticated && userId === post.creator">
                       <div class="icon" (click)="deletePost(post)">
                         <i class="fa fa-trash"></i>
                       </div>

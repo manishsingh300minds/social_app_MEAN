@@ -2,98 +2,112 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../model/dataModel');
 const multer = require('multer');
-const check_auth = require('../middleware/check-auth')
+const check_auth = require('../middleware/check-auth');
 
-const MIME_TYPE_MAP = {
-  'image/png' : 'png',
-  'image/jpeg' : 'jpg',
-  'image/jpg' : 'jpg',
-}
+  const MIME_TYPE_MAP = {
+    'image/png' : 'png',
+    'image/jpeg' : 'jpg',
+    'image/jpg' : 'jpg',
+  }
 
-const storage = multer.diskStorage({
-  destination: (req, file, callBack) => {
-    const isValid = MIME_TYPE_MAP[file.mimetype];
-    let error= new Error('invalid mime type');
-    if(isValid){
-      error = null;
+  const storage = multer.diskStorage({
+    destination: (req, file, callBack) => {
+      const isValid = MIME_TYPE_MAP[file.mimetype];
+      let error= new Error('invalid mime type');
+      if(isValid){
+        error = null;
+      }
+      callBack(error, "backend/images");
+    },
+    filename: (req, file, callBack) => {
+      const name = file.originalname.toLocaleLowerCase().split(' ').join('-');
+      const ext = MIME_TYPE_MAP[file.mimetype];
+      callBack(null, name + '-' + Date.now() + '.' + ext);
     }
-    callBack(error, "backend/images");
-  },
-  filename: (req, file, callBack) => {
-    const name = file.originalname.toLocaleLowerCase().split(' ').join('-');
-    const ext = MIME_TYPE_MAP[file.mimetype];
-    callBack(null, name + '-' + Date.now() + '.' + ext);
-  }
-});
-
-router.get("/listing",(req, res) => {
-  const pageSize = +req.query.pagesize;
-  const currentPage = +req.query.page;
-  const postQuery = Post.find();
-  let fetchedPost;
-  if(pageSize && currentPage){
-    postQuery
-        .skip(pageSize * (currentPage-1))
-        .limit(pageSize)
-  }
-  // then() can be use to get the data received from frontend
-  postQuery.then((documents) => {
-    fetchedPost = documents;
-    return Post.count();
-  }).then(count => {
-    res.status(200).json({
-      msg : "Posts fetched successfully",
-      posts : fetchedPost,
-      maxPosts: count
-    })
-  })
-});
-
-router.post("/create",check_auth, multer({storage: storage}).single('image'), (req, res) => {
-  // protocol http / https ---> :// for full url
-  const url = req.protocol + '://' + req.get("host");
-  const postData = new Post({
-    title : req.body.title,
-    description : req.body.description,
-    image: url + "/images/" + req.file.filename
   });
-  postData.save().then(addedPost => {
-    res.status(201).json({
-      msg: "Added the new post successfully",
-      post: {
-        ...addedPost,
-        id : addedPost._id,
+
+  router.get("/listing",(req, res) => {
+    const pageSize = +req.query.pageSize;
+    const currentPage = +req.query.page;
+    const postQuery = Post.find();
+    let fetchedPost;
+    if(pageSize && currentPage){
+      postQuery
+          .skip(pageSize * (currentPage-1))
+          .limit(pageSize)
+    }
+    // then() can be use to get the data received from frontend
+    postQuery.then((documents) => {
+      fetchedPost = documents;
+      return Post.count();
+    }).then(count => {
+      res.status(200).json({
+        msg : "Posts fetched successfully",
+        posts : fetchedPost,
+        maxPosts: count
+      })
+    })
+  });
+
+  router.post("/create",check_auth, multer({storage: storage}).single('image'), (req, res) => {
+    // protocol http / https ---> :// for full url
+    const url = req.protocol + '://' + req.get("host");
+    const postData = new Post({
+      title : req.body.title,
+      description : req.body.description,
+      image: url + "/images/" + req.file.filename,
+      creator: req.userData.userId
+    });
+    postData.save().then(addedPost => {
+      res.status(201).json({
+        msg: "Added the new post successfully",
+        post: {
+          ...addedPost,
+          id : addedPost._id,
+        }
+      });
+    });
+  })
+
+  router.put("/create/:id", check_auth, multer({storage: storage}).single('image'),(req,res) => {
+    let imagePath = req.body.image;
+    if(req.file){
+      const url = req.protocol + '://' + req.get("host");
+      imagePath = url + "/images/" + req.file.filename
+    }
+    const editedPost = new Post({
+      _id : req.params.id,
+      title : req.body.title,
+      description : req.body.description,
+      image : imagePath,
+      creator: req.userData.userId
+    });
+    Post.updateOne({_id : req.params.id, creator: req.userData.userId},editedPost).then(result => {
+      if(result.nModified > 0){
+        res.status(200).json({
+          msg : 'Update successful!!'
+        });
+      } else{
+        res.status(401).json({
+          msg : 'Unauthorized User!!'
+        });
       }
     });
-  });
-})
+  })
 
-router.put("/create/:id", check_auth, multer({storage: storage}).single('image'),(req,res) => {
-  let imagePath = req.body.image;
-  if(req.file){
-    const url = req.protocol + '://' + req.get("host");
-    imagePath = url + "/images/" + req.file.filename
-  }
-  const editedPost = new Post({
-    _id : req.params.id,
-    title : req.body.title,
-    description : req.body.description,
-    image : imagePath
-  });
-  Post.updateOne({_id : req.params.id},editedPost).then(result => {
-    res.status(200).json({
-      msg : 'Update successful'
+  router.delete("/listing/:id",check_auth,(req ,res) => {
+    Post.deleteOne({_id: req.params.id,creator: req.userData.userId})
+    .then(result => {
+      if(result.n > 0){
+        res.status(200).json({
+          msg : 'Deletion successful!!'
+        });
+      } else{
+        res.status(401).json({
+          msg : 'Unauthorized User!!'
+        });
+      }
     });
-  });
-})
-
-router.delete("/listing/:id",check_auth,(req ,res) => {
-  Post.deleteOne({_id: req.params.id})
-  .then(result => {
-    res.status(200).json({
-      msg: "Post has been deleted"
-    })
-  });
-})
+  })
 
 module.exports = router;

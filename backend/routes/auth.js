@@ -44,7 +44,8 @@ const jwt = require('jsonwebtoken');
                 );
                 res.status(200).json({
                     token: token,
-                    expiresIn: 3600
+                    expiresIn: 3600, //Sent time in seconds
+                    userId: fetchUser._id
                 });
             })
             .catch(err => {

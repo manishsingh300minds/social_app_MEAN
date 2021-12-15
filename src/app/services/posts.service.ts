@@ -13,7 +13,7 @@ export class PostsService {
   constructor(private http: HttpClient) { }
 
   getPosts(postsPerPage: number, currentPage : number): Observable<any> {
-    const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
+    const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
     return this.http.get<any>(this.api + '/listing'+queryParams).pipe(map((postData: any) => {
       return  {
         posts: postData.posts.map((post: any) => {
@@ -21,13 +21,14 @@ export class PostsService {
             title: post.title,
             description: post.description,
             id: post._id,
-            image: post.image
+            image: post.image,
+            creator: post.creator
           }
         }),
         maxPosts : postData.maxPosts
       }
     }),
-      catchError(this.handleError));
+      catchError(PostsService.handleError));
   }
 
   addPost(data: any): Observable<any> {
@@ -35,7 +36,7 @@ export class PostsService {
     postData.append("title", data.title);
     postData.append("description", data.description);
     postData.append("image", data.image, data.image.name);
-    return this.http.post<Task>(this.api + '/create', postData).pipe(catchError(this.handleError));
+    return this.http.post<Task>(this.api + '/create', postData).pipe(catchError(PostsService.handleError));
   }
 
   updatePost(id: string, title: string, description: string, image: File | string | null) {
@@ -53,18 +54,19 @@ export class PostsService {
         id: id,
         title: title,
         description: description,
-        image: image
+        image: image,
+        creator: null
       }
     }
     // @ts-ignore
-    return this.http.put(`${this.api}/create/${id}`, postData).pipe(catchError(this.handleError));
+    return this.http.put(`${this.api}/create/${id}`, postData).pipe(catchError(PostsService.handleError));
   }
 
   deletePost(id: string): Observable<any> {
-    return this.http.delete<void>(`${this.api}/listing/${id}`).pipe(catchError(this.handleError));
+    return this.http.delete<void>(`${this.api}/listing/${id}`).pipe(catchError(PostsService.handleError));
   }
 
-  private handleError(errorResponse: HttpErrorResponse): Observable<any> {
+  private static handleError(errorResponse: HttpErrorResponse): Observable<any> {
     if (errorResponse.error instanceof Error) {
       console.log("Client Side Error:", errorResponse.error.message);
     }

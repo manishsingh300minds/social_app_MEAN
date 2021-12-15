@@ -1,5 +1,4 @@
 import { RouterModule, Routes } from '@angular/router';
-import { PublicComponent } from './public/public.component';
 import {LoginComponent} from "./auth/login/login.component";
 import {SignupComponent} from "./auth/signup/signup.component";
 
@@ -12,10 +11,9 @@ const routes: Routes = [
     loadChildren: (): any => import('./admin/admin.module').then((m) => m.AdminModule,
     ),
   },
-  { path: 'public', component: PublicComponent},
   { path: 'auth/login', component: LoginComponent},
   { path: 'auth/signup', component: SignupComponent},
-  { path: '**', component: PublicComponent}
+  { path: '**', loadChildren: (): any => import('./admin/admin.module').then((m) => m.AdminModule,)}
 ];
 
 export const appRoutingModule = RouterModule.forRoot(routes);
