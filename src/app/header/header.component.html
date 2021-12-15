@@ -1,0 +1,29 @@
+<div class="header-component">
+  <nav class="navbar navbar-expand-lg navbar-dark nav-content">
+    <div class="container-fluid d-flex justify-content-between">
+      <div class="d-flex">
+        <a class="navbar-brand pt-2" routerLink="/dashboard/listing"><i class="fa fa-tasks"></i>Task</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a id="list" class="nav-link active" routerLink="/dashboard/listing" (click)="changePage($event)">List</a>
+            </li>
+            <li class="nav-item" *ngIf="isAuthenticated">
+              <a id="create" class="nav-link" routerLink="/dashboard/create" (click)="changePage($event)">Create</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="profile" *ngIf="!isAuthenticated">
+        <a class="btn btn-outline-light mr-4" routerLink="auth/login">Login</a>
+        <a class="btn btn-outline-light" routerLink="auth/signup">Sign in</a>
+      </div>
+      <div class="profile" *ngIf="isAuthenticated">
+        <button class="btn btn-outline-light mr-4" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+</div>

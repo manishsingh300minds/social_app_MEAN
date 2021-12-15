@@ -1,0 +1,27 @@
+.signup-component{
+  .container{
+    width: 50%;
+    margin-top: 90px;
+  }
+  .card .card-header{
+    color: #5f0a87;
+    background-color: #f8f9fa;
+    font-size: 24px;
+    font-weight: 500;
+  }
+  .err{
+    color: red;
+    font-size: 12px;
+    margin: 5px 0px 0px 5px;
+  }
+  .btn:disabled{
+    background-color: #eee;
+    border-color: #333;
+  }
+  .fa-plus{
+    margin-right: 5px;
+  }
+  .add-button:hover .fa{
+    color: #fff;
+  }
+}
