@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { AdminComponent } from './admin.component';
+import { FeatureComponent } from './feature.component';
 import { CreateComponent } from './create/create.component';
 import { ListingComponent } from './listing/listing.component';
 import {AuthGuard} from "../guard/auth.guard";
 
 export const routes: Routes = [
-  { path:'', component: AdminComponent, children: [
+  { path:'', component: FeatureComponent, children: [
     { path: '', redirectTo: 'listing', pathMatch: 'full' },
     { path: 'listing', component: ListingComponent},
     { path: 'create', component: CreateComponent, canActivate: [AuthGuard]},
@@ -13,4 +13,4 @@ export const routes: Routes = [
   ]},
 ];
 
-export const components = [AdminComponent];
+export const components = [FeatureComponent];

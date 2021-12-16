@@ -1,6 +1,4 @@
 import { RouterModule, Routes } from '@angular/router';
-import {LoginComponent} from "./auth/login/login.component";
-import {SignupComponent} from "./auth/signup/signup.component";
 
 const routes: Routes = [
   {
@@ -8,12 +6,15 @@ const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadChildren: (): any => import('./admin/admin.module').then((m) => m.AdminModule,
+    loadChildren: (): any => import('./feature/feature.module').then((m) => m.FeatureModule,
     ),
   },
-  { path: 'auth/login', component: LoginComponent},
-  { path: 'auth/signup', component: SignupComponent},
-  { path: '**', loadChildren: (): any => import('./admin/admin.module').then((m) => m.AdminModule,)}
+  {
+    path: 'auth',
+    loadChildren: (): any => import('./auth/auth.module').then((m) => m.AuthModule,
+    ),
+  },
+  { path: '**', loadChildren: (): any => import('./feature/feature.module').then((m) => m.FeatureModule,)}
 ];
 
 export const appRoutingModule = RouterModule.forRoot(routes);

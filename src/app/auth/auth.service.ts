@@ -19,6 +19,7 @@ export class AuthService{
     private userId!: string | null;
     horizontalPosition: MatSnackBarHorizontalPosition = 'end';
     verticalPosition: MatSnackBarVerticalPosition = 'top';
+
     constructor(private http : HttpClient, private router: Router, private alert:MatSnackBar) {
     }
 
@@ -30,12 +31,12 @@ export class AuthService{
         return this.isAuth;
     }
 
-    getAuthStatusListener(){
-        return this.authStatusListener.asObservable();
-    }
-
     getUserId(){
         return this.userId;
+    }
+
+    getAuthStatusListener(){
+        return this.authStatusListener.asObservable();
     }
 
     autoAuthUser(){
@@ -111,7 +112,7 @@ export class AuthService{
             horizontalPosition: this.horizontalPosition,
             verticalPosition: this.verticalPosition,
             panelClass: 'alertComponent',
-            data: {message : 'Logged out successfully'}
+            data: {message : 'Logged out successfully!!'}
         });
     }
 

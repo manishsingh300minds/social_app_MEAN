@@ -5,16 +5,16 @@ import { RouterModule } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
 
-import { AdminComponent } from "./admin.component";
+import { FeatureComponent } from "./feature.component";
 import { ListingComponent } from "./listing/listing.component";
 import { CreateComponent } from "./create/create.component";
 
-import { routes } from "./admin-routing";
+import { routes } from "./feature-routing";
 import {MatPaginatorModule} from "@angular/material/paginator";
 
 @NgModule({
     declarations: [
-        AdminComponent,
+        FeatureComponent,
         ListingComponent,
         CreateComponent
     ],
@@ -27,6 +27,6 @@ import {MatPaginatorModule} from "@angular/material/paginator";
         NgbAlertModule,
         MatPaginatorModule
     ],
-    bootstrap: [AdminComponent]
+    bootstrap: [FeatureComponent]
 })
-export class AdminModule {}
+export class FeatureModule {}

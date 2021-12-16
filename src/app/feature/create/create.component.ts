@@ -84,7 +84,7 @@ export class CreateComponent implements OnInit {
               horizontalPosition: this.horizontalPosition,
               verticalPosition: this.verticalPosition,
               panelClass: 'alertComponent',
-              data: {message : 'Added post successfully'}
+              data: {message : 'Post added successfully.'}
             });
         this.postForm.reset();
       },
@@ -104,7 +104,7 @@ export class CreateComponent implements OnInit {
               horizontalPosition: this.horizontalPosition,
               verticalPosition: this.verticalPosition,
               panelClass: 'alertComponent',
-              data: {message : 'Updated post successfully'}
+              data: {message : 'Post updated successfully.'}
             });
       },
         (error: any) => console.log("Updating server error:", error));

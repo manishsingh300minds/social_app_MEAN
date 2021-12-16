@@ -1,4 +1,8 @@
 {
+  "env": {
+    "MONGO_ATLAS_PW": "rrjNshtDjPAPBkH1",
+    "JWT_KEY": "write_as_long_as_you_can"
+  },
   "events": {
     "restart": "kill-port 4000",
     "crash": "kill-port 4000"

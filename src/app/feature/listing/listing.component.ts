@@ -59,7 +59,7 @@ export class ListingComponent implements OnInit,OnDestroy {
           horizontalPosition: this.horizontalPosition,
           verticalPosition: this.verticalPosition,
           panelClass: 'alertComponent',
-          data: {message : 'Deleted post successfully'}
+          data: {message : 'Post deleted successfully.'}
         });
         this.getPosts(this.postsPerPage,this.currentPage);
       },
